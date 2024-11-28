@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaShoppingCart } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
+import { DEL } from "../redux/actions/action";
 
 const Navbar = () => {
   // Get cart data from Redux store
@@ -11,6 +12,7 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const location = useLocation(); // To monitor the current location and reset dropdown
 
+  const dispatch = useDispatch();
   // Toggle dropdown visibility
   const toggleDropdown = () => setDropDown((prevState) => !prevState);
 
@@ -43,6 +45,11 @@ const Navbar = () => {
     }
     return total;  // Return the total as it is if price or qty are invalid
   }, 0);
+
+
+  const handleDelete = (id) => {
+    dispatch(DEL(id));
+  }
 
   return (
     <nav className="bg-gray-800">
@@ -151,7 +158,9 @@ const Navbar = () => {
                           </button>
                         </div>
                       </div>
-                      <button className="text-2xl inline-flex items-center justify-end">
+                      <button
+                      onClick={()=>handleDelete(item.id)}
+                      className="text-2xl inline-flex items-center justify-end">
                         <span className="text-red-500 hover:text-red-700">
                           <MdDelete />
                         </span>

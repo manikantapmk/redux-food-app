@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa"; // Import star icons
+// import { DEL } from "../redux/actions/action";
 
 const CardDetails = () => {
   const [data, setData] = useState([]);
@@ -14,7 +15,8 @@ const CardDetails = () => {
       return e.id == id;
     });
     return compareData;
-  };
+  };  
+
 
   useEffect(() => {
     setData(compare());
@@ -25,6 +27,7 @@ const CardDetails = () => {
     const fullStars = Math.floor(rating); // Number of full stars
     const hasHalfStar = rating % 1 >= 0.5; // Check if there's a half star
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0); // Remaining empty stars
+
 
     return (
       <div className="flex items-center gap-1">
@@ -49,9 +52,9 @@ const CardDetails = () => {
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
         {data.map((eachI) => (
           <div className="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16" key={eachI.id}>
-            <div className="shrink-0 max-w-md lg:max-w-lg mx-auto rounded-lg overflow-hidden">
+            <div className="shrink-0 max-w-md lg:max-w-lg mx-auto h-[340px] rounded-lg overflow-hidden">
               <img
-                className="w-full hidden dark:block"
+                className="w-full hidden dark:block h-full"
                 src={eachI.imgdata}
                 alt={eachI.rname}
               />

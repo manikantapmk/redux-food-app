@@ -10,6 +10,13 @@ export const cartReducer = (state=INIT_STATE, action) => {
             carts: [...state.carts, action.payload]        
         }
 
+        case "DEL_CART": 
+        const data = state.carts.filter((el)=>el.id !== action.payload);
+        return {
+            ...state,
+            carts: data,    
+        }
+
         default: return state
     }
 }
