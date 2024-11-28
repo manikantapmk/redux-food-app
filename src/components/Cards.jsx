@@ -1,9 +1,19 @@
 import React, { useState } from "react";
 import { CardsData } from "./CardsData";
+import { useDispatch } from "react-redux";
+
+import { ADD } from "../redux/actions/action";
 
 const Cards = () => {
   const [data, setData] = useState(CardsData);
-  console.log(data);
+  // console.log(data);
+
+  const dispatch = useDispatch();
+
+  const send = (e) => {
+    dispatch(ADD(e));
+  };
+
   return (
     <section>
       <div className="container py-5">
@@ -13,7 +23,7 @@ const Cards = () => {
             const { id, rname, imgdata, address, price } = prod;
             return (
               <div
-                id={id}
+                key={id}
                 className="min-w-[300px] rounded-lg bg-base-100 w-64 overflow-hidden shadow-md"
               >
                 <figure>
@@ -28,8 +38,11 @@ const Cards = () => {
                     </span>
                   </p>
                   <div className="card-actions justify-end">
-                    <button className="text-white bg-blue-800 hover:bg-blue-600 duration-300 px-4 py-1 rounded-md shadow-lg">
-                      Buy Now
+                    <button
+                      onClick={() => send(prod)}
+                      className="text-white bg-blue-800 hover:bg-blue-600 duration-300 px-4 py-1 rounded-md shadow-lg"
+                    >
+                      Add to Cart
                     </button>
                   </div>
                 </div>
