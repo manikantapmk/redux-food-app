@@ -10,9 +10,9 @@ const Cards = () => {
 
   const dispatch = useDispatch();
 
-  const send = (e) => {
-    dispatch(ADD(e));
-  };
+ const send = (product) => {
+  dispatch({ type: "ADD_CART", payload: product });
+};
 
   return (
     <section>

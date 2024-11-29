@@ -3,20 +3,19 @@ import { FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
-import { DEL } from "../redux/actions/action";
+import { DEL, incrementQuantity, decrementQuantity } from "../redux/actions/action";
 
 const Navbar = () => {
-  // Get cart data from Redux store
   const getData = useSelector((state) => state.cartReducer.carts);
   const [dropDown, setDropDown] = useState(false);
+  const [price, setPrice] = useState(0);
   const dropdownRef = useRef(null);
-  const location = useLocation(); // To monitor the current location and reset dropdown
+  const location = useLocation();
 
   const dispatch = useDispatch();
-  // Toggle dropdown visibility
+
   const toggleDropdown = () => setDropDown((prevState) => !prevState);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -29,33 +28,38 @@ const Navbar = () => {
     };
   }, []);
 
-  // Reset dropdown when navigating to 'View Cart' page or other pages
   useEffect(() => {
-    setDropDown(false); // Close dropdown on page change (when URL changes)
+    setDropDown(false);
   }, [location]);
 
-  // Calculate total price of items in the cart
-  const totalPrice = getData.reduce((total, item) => {
-    const price = parseFloat(item.price);  // Ensure price is a number
-    const qty = parseInt(item.qty, 10);   // Ensure qty is a number
-
-    // Only include items where price and qty are valid numbers
-    if (!isNaN(price) && !isNaN(qty)) {
-      return total + price * qty;
-    }
-    return total;  // Return the total as it is if price or qty are invalid
-  }, 0);
-
+  const totalPrice = () => {
+    let total = 0; // Initialize total to 0
+    getData.forEach((item) => {
+      total += item.price * item.quantity; // Multiply price by quantity and add to total
+    });
+    setPrice(total); // Update the state with the calculated total
+  };
+  
+  useEffect(() => {
+    totalPrice();
+  }, [getData]); // Recalculate whenever cart data changes
 
   const handleDelete = (id) => {
     dispatch(DEL(id));
-  }
+  };
+
+  const handleIncrement = (id) => {
+    dispatch(incrementQuantity(id));
+  };
+
+  const handleDecrement = (id) => {
+    dispatch(decrementQuantity(id));
+  };
 
   return (
     <nav className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
-          {/* Mobile menu button */}
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             <button
               type="button"
@@ -81,7 +85,6 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Logo and navigation links */}
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
@@ -101,7 +104,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Shopping cart icon */}
           <div className="inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <button
               type="button"
@@ -115,26 +117,23 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Dropdown menu */}
           {dropDown && (
             <div
               ref={dropdownRef}
               className="absolute top-16 right-0 gap-4 border-b p-4 mb-4 bg-slate-100 rounded-sm max-h-lvh overflow-y-scroll"
             >
-              {/* Cart Items Header */}
               <div className="flex min-w-[512px] w-full justify-between border-b-4 border-blue-950">
                 <h1 className="font-bold">Photo</h1>
                 <h4 className="font-bold">Restaurant Name</h4>
               </div>
 
-              {/* Cart Items List */}
               {getData.length === 0 ? (
                 <h1 className="text-3xl text-center">No Products Added</h1>
               ) : (
                 <div>
                   {getData.map((item, index) => (
                     <div
-                      key={`${item.id}-${index}`}  // Combine item.id with the index to ensure uniqueness
+                      key={`${item.id}-${index}`}
                       className="grid grid-cols-3 bg-slate-50 p-3 rounded-lg"
                     >
                       <Link to={`/view-cart/${item.id}`}>
@@ -146,21 +145,28 @@ const Navbar = () => {
                       </Link>
                       <div className="flex-1 ml-4">
                         <h3 className="font-semibold">{item.rname}</h3>
-                        <p>Quantity: {item.qty}</p>
+                        <p>Quantity: {item.quantity}</p>
                         <p>Price: ₹ {item.price}/-</p>
                         <div className="flex items-center mt-2">
-                          <button className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400">
+                          <button
+                            onClick={() => handleDecrement(item.id)}
+                            className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400"
+                          >
                             -
                           </button>
                           <span className="mx-2">{item.qty}</span>
-                          <button className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400">
+                          <button
+                            onClick={() => handleIncrement(item.id)}
+                            className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400"
+                          >
                             +
                           </button>
                         </div>
                       </div>
                       <button
-                      onClick={()=>handleDelete(item.id)}
-                      className="text-2xl inline-flex items-center justify-end">
+                        onClick={() => handleDelete(item.id)}
+                        className="text-2xl inline-flex items-center justify-end"
+                      >
                         <span className="text-red-500 hover:text-red-700">
                           <MdDelete />
                         </span>
@@ -168,7 +174,7 @@ const Navbar = () => {
                     </div>
                   ))}
                   <h6 className="text-lg border-t">
-                    Total : <span className="font-semibold">₹ {totalPrice}</span>
+                    Total : <span className="font-semibold">₹ {price}</span>
                   </h6>
                 </div>
               )}
